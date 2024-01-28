@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import { Button, ErrorText, Form, FormContainer, Input } from '../../components/FormComponent'
-import { register } from '../../redux/actions/auth'
 import AlertComponent from '../../components/Alert'
-import { getUserDetails } from '../../redux/actions/user'
+import { getUserDetails, updateUserProfile } from '../../redux/actions/user'
 import styled from 'styled-components'
+import { useLocation } from 'react-router-dom'
 
 const UserHeading = styled.h3`
   text-align: center;
@@ -23,6 +23,7 @@ const validate = values => {
 }
 
 function Profile () {
+  const { state } = useLocation()
   const dispatch = useDispatch()
   const userDetails = useSelector(state => state.user.userDetails)
   const successMessage = useSelector(state => state.user.successMessage)
@@ -34,7 +35,22 @@ function Profile () {
 
   useEffect(() => {
     dispatch(getUserDetails())
+    if (state?.message) {
+      setMessage(state?.message)
+      setAlert(true)
+      setSuccess(true)
+    }
   }, [])
+
+  useEffect(() => {
+    if (alert) {
+      setTimeout(() => {
+        setAlert(false)
+      }, 3000)
+    }
+  }, [alert])
+
+  console.log('userDetails', userDetails)
 
   useEffect(() => {
     if (successMessage) {
@@ -45,37 +61,56 @@ function Profile () {
   }, [successMessage])
 
   useEffect(() => {
-    if (errorMessage) {
+    if (typeof errorMessage === 'string') {
       setMessage(errorMessage)
       setAlert(true)
       setSuccess(false)
+    } else {
+      formik.setErrors(errorMessage)
     }
   }, [errorMessage])
 
   const formik = useFormik({
     initialValues: {
-      first_name: userDetails?.first_name,
-      last_name: userDetails?.last_name,
-      city: userDetails?.city,
-      phone: userDetails?.phone,
-      email: userDetails?.email,
-      // profile_image: userDetails?.profile_image,
-      password: userDetails?.password
+      first_name: '',
+      last_name: '',
+      city: '',
+      phone: '',
+      email: '',
+      profile_image: '',
+      password: ''
     },
     validate,
     onSubmit: (values) => {
       console.log("values", values)
-      dispatch(register(values))
+      dispatch(updateUserProfile(values))
     }
   })
+  console.log('formik', formik)
+  
+  useEffect(() => {
+    if (userDetails) {
+      formik.setValues({
+        first_name: userDetails?.first_name || '',
+        last_name: userDetails?.last_name || '',
+        city: userDetails?.city || '',
+        phone: userDetails?.phone || '',
+        email: userDetails?.email || '',
+        profile_image: userDetails?.profile_image || '',
+        // password: userDetails?.password
+      })
+    }
+  }, [userDetails])
+
 
   return (
     <FormContainer>
+      {alert && <AlertComponent message={message} setAlert={setAlert} success={success} />}
       <UserHeading>
         Welcome 
+        {' '}
         {userDetails?.first_name}
       </UserHeading>
-      {alert && <AlertComponent message={message} setAlert={setAlert} success={success} />}
       <Form onSubmit={formik.handleSubmit}>
         <Input
           error={formik.touched.first_name && formik.errors.first_name}

@@ -4,36 +4,38 @@ import { LOGIN, REGISTER } from "../constants";
 
 export const login = (data) => async (dispatch) => {
   await instanceAxios.post('/login', data).then((response) => {
-    console.log('response :>> ', response);
-    localStorage.setItem('Token', response.data.Authorization)
-    localStorage.setItem('userData', JSON.stringify(response.data.data))
+    localStorage.setItem('Token', response?.data?.data?.token)
+    const userData = {
+      name: response?.data?.data?.first_name + response?.data?.data?.last_name,
+      id: response?.data?.data?.id
+    }
+    localStorage.setItem('UserData', userData)
     dispatch({
       type: LOGIN,
       payload: {
-        data: response.data.data,
         successMessage: response.data.message,
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(LOGIN, error))
   })
 }
 
 export const register = (data) => async (dispatch) => {
   await instanceAxios.post('/register', data).then((response) => {
-    console.log('response :>> ', response);
-    localStorage.setItem('Token', response.data.Authorization)
-    localStorage.setItem('userData', JSON.stringify(response.data.data))
+    localStorage.setItem('Token', response?.data?.data?.token)
+    const userData = {
+      name: response?.data?.data?.first_name + response?.data?.data?.last_name,
+      id: response?.data?.data?.id
+    }
+    localStorage.setItem('UserData', userData)
     dispatch({
       type: REGISTER,
       payload: {
-        data: response.data.data,
         successMessage: response.data.message,
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(REGISTER, error))
   })
 }

@@ -11,10 +11,11 @@ function CategoryOpsIndex() {
     <div>
       <Navbar />
       <HeaderComponent
-        blogId={categoryId}
         heading={categoryId ? 'Edit Category' : 'Add Category'}
       />
-      <CategoryOperation />
+      <CategoryOperation
+        categoryId={categoryId}
+      />
     </div>
   )
 }

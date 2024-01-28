@@ -12,10 +12,11 @@ function BlogOpsIndex() {
     <div>
       <Navbar />
       <HeaderComponent
-        blogId={blogId}
         heading={blogId ? 'Edit Blog' : 'Add Blog'}
       />
-      <BlogOperation />
+      <BlogOperation
+        blogId={blogId}
+      />
     </div>
   )
 }

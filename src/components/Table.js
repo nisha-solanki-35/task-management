@@ -15,6 +15,17 @@ export const Th = styled.th`
 export const Td = styled.td`
   padding: 10px;
   border-bottom: 1px solid #ddd;
+  height: ${(props) => props.img && '30px'};
+  width: ${(props) => props.img && '30px'};
+`;
+
+export const TaskButton = styled.button`
+  background-color: #72A0C1;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  margin-right: 5px;
 `;
 
 export const EditButton = styled.button`

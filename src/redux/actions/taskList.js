@@ -3,8 +3,8 @@ import { catchError, successFunc } from "../../helper/helper";
 import { ADD_TASK_LIST, CLEAR_RES_MESSAGE, DELETE_TASK_LIST, GET_TASK_LIST, GET_TASK_LIST_DETAILS, UPDATE_TASK_LIST } from "../constants";
 
 export const getTaskList = () => async (dispatch) => {
+  dispatch({ type: CLEAR_RES_MESSAGE })
   await instanceAxios.get('/task/list').then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: GET_TASK_LIST,
       payload: {
@@ -13,14 +13,13 @@ export const getTaskList = () => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(GET_TASK_LIST, error))
   })
 }
 
 export const getTaskListDetails = (taskListId) => async (dispatch) => {
+  dispatch({ type: CLEAR_RES_MESSAGE })
   await instanceAxios.get(`/task/list/${taskListId}`).then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: GET_TASK_LIST_DETAILS,
       payload: {
@@ -29,14 +28,13 @@ export const getTaskListDetails = (taskListId) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(GET_TASK_LIST_DETAILS, error))
   })
 }
 
 export const addTaskList = (data) => async (dispatch) => {
+  dispatch({ type: CLEAR_RES_MESSAGE })
   await instanceAxios.post('/task/list', data).then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: ADD_TASK_LIST,
       payload: {
@@ -44,14 +42,13 @@ export const addTaskList = (data) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(ADD_TASK_LIST, error))
   })
 }
 
 export const updateTaskList = (data, taskListId) => async (dispatch) => {
+  dispatch({ type: CLEAR_RES_MESSAGE })
   await instanceAxios.put(`/task/list/${taskListId}`, data).then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: UPDATE_TASK_LIST,
       payload: {
@@ -59,7 +56,6 @@ export const updateTaskList = (data, taskListId) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(UPDATE_TASK_LIST, error))
   })
 }

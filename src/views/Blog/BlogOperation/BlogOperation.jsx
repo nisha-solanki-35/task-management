@@ -6,9 +6,10 @@ import { useNavigate } from 'react-router-dom'
 import AlertComponent from '../../../components/Alert'
 import { addBlog, getBlogDetails, updateBlog } from '../../../redux/actions/blog'
 import PropTypes from 'prop-types'
+import moment from 'moment'
 
 const validate = values => {
-  const requiredFields = ['title', 'category_id', 'description', 'attachment']
+  const requiredFields = ['user_id', 'blog_date', 'title', 'category_id', 'description', 'attachment']
   const errors = {}
   requiredFields.forEach(field => {
     if (!values[field]) {
@@ -52,10 +53,12 @@ function BlogOperation (props) {
   }, [successMessage])
 
   useEffect(() => {
-    if (errorMessage) {
+    if (typeof errorMessage === 'string') {
       setMessage(errorMessage)
       setAlert(true)
       setSuccess(false)
+    } else {
+      formik.setErrors(errorMessage)
     }
   }, [errorMessage])
 
@@ -68,13 +71,7 @@ function BlogOperation (props) {
   }, [alert])
 
   const formik = useFormik({
-    initialValues: blogId ? {
-      title: blogDetails?.title,
-      category_id: blogDetails?.category_id,
-      description: blogDetails?.description,
-      attachment: blogDetails?.attachment
-    } 
-    : {
+    initialValues: {
       title: '',
       category_id: '',
       description: '',
@@ -91,10 +88,47 @@ function BlogOperation (props) {
     }
   })
 
+  useEffect(() => {
+    if (blogDetails) {
+      formik.setValues({
+        user_id: '',
+        blog_date: moment(Date.now()).format('DD-MM-YYYY') || '',
+        title: blogDetails?. title|| '',
+        category_id: blogDetails?.category_id || '',
+        description: blogDetails?.description|| '',
+        attachment: blogDetails?.attachment || ''
+      })
+    }
+  }, [blogDetails])
+
   return (
     <FormContainer>
       {alert && <AlertComponent message={message} setAlert={setAlert} success={success} />}
       <Form onSubmit={formik.handleSubmit}>
+        <Input
+          error={formik.touched.user_id && formik.errors.user_id}
+          id="user_id"
+          name="user_id"
+          onChange={formik.handleChange}
+          placeholder="User Id"
+          type="text"
+          value={formik.values.user_id}
+        />
+        {formik.touched.user_id && formik.errors.user_id ? (
+          <ErrorText>{formik.errors.user_id}</ErrorText>
+        ) : null}
+        <Input
+          error={formik.touched.blog_date && formik.errors.blog_date}
+          id="blog_date"
+          name="blog_date"
+          onChange={formik.handleChange}
+          placeholder="Date"
+          type="text"
+          value={formik.values.blog_date}
+        />
+        {formik.touched.blog_date && formik.errors.blog_date ? (
+          <ErrorText>{formik.errors.blog_date}</ErrorText>
+        ) : null}
         <Input
           error={formik.touched.title && formik.errors.title}
           id="title"
@@ -137,7 +171,7 @@ function BlogOperation (props) {
           name="attachment"
           onChange={formik.handleChange}
           placeholder="Attachment"
-          type="file"
+          type="text"
           value={formik.values.attachment}
         />
         {formik.touched.attachment && formik.errors.attachment ? (

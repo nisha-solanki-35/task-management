@@ -3,15 +3,14 @@ import { useSelector, useDispatch } from 'react-redux'
 import { DeleteButton, EditButton, Table, Td, Th, Button, ButtonContainer, DataNotFound } from '../../components/Table'
 import { useNavigate } from 'react-router-dom'
 import { getBlogs } from '../../redux/actions/blog'
+import moment from 'moment'
 // import PropTypes from 'prop-types'
 
 function Blogs() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const blogss = useSelector(state => state.blog.blogList)
-  console.log('blogss :>> ', blogss);
-  const blogs = [
-   ]
+  const blogs = useSelector(state => state.blog.blogList)
+
 
   useEffect(() => {
     dispatch(getBlogs())
@@ -30,18 +29,32 @@ function Blogs() {
       <Table>
         <thead>
           <tr>
+            <Th>Id</Th>
             <Th>Author Name</Th>
+            <Th>Title</Th>
             <Th>Category</Th>
             <Th>Task Date</Th>
+            <Th>Attachment</Th>
             <Th>Actions</Th>
           </tr>
         </thead>
         <tbody>
-          {blogs?.map(blog => (
+          {blogs?.data?.map(blog => (
             <tr key={blog?.id}>
-              <Td>{blog?.name}</Td>
-              <Td>{blog?.category}</Td>
-              <Td>{blog?.date}</Td>
+              <Td>{blog?.id || '--'}</Td>
+              <Td>{blog?.user_detail?.first_name + blog?.user_detail?.last_name|| '--'}</Td>
+              <Td>{blog?.title || '--'}</Td>
+              <Td>{blog?.category?.length > 0 ? blog?.category?.toString() : '--'}</Td>
+              <Td>{moment(blog?.created_at).format('LLL')}</Td>
+              <Td>
+                <img 
+                  src={blog?.attachment}
+                  style={{
+                    height: "45px",
+                    width: "60px",
+                  }}
+                />
+              </Td>
               <Td>
                 <EditButton onClick={() => navigate(`/blogs/update-blog/${blog.id}`)}>Edit</EditButton>
                 <DeleteButton onClick={() => onDelete(blog.id)}>Delete</DeleteButton>

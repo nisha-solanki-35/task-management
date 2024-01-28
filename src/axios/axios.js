@@ -7,7 +7,7 @@ const instanceAxios = axios.create({
 instanceAxios.interceptors.request.use((req) => {
   const token = localStorage.getItem('Token')
   if (!req.headers.Authorization && token && !req.headers.noAuth) {
-    req.headers.Authorization = token
+    req.headers.Authorization = 'Bearer ' + token
     return req
   }
   return req

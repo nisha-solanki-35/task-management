@@ -29,3 +29,10 @@ export const ErrorText = styled.p`
   margin-top: -10px;
   margin-bottom: 10px;
 `;
+
+export const StyledSelect = styled.select`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: ${(props) => (props.error && '1px solid red')};
+`;

@@ -68,22 +68,27 @@ function TaskListOperation (props) {
   }, [alert])
 
   const formik = useFormik({
-    initialValues: taskListId ? {
-      name: taskListDetails?.name
-    } 
-    : {
+    initialValues: {
       name: '',
     },
     validate,
     onSubmit: values => {
       console.log('Form values:', values);
       if (taskListId) {
-        dispatch(updateTaskList(values))
+        dispatch(updateTaskList(values, taskListId))
       } else {
         dispatch(addTaskList(values))
       }
     }
-  });
+  })
+
+  useEffect(() => {
+    if (taskListDetails) {
+      formik.setValues({
+        name: taskListDetails?.name || '',
+      })
+    }
+  }, [taskListDetails])
 
   return (
     <FormContainer>

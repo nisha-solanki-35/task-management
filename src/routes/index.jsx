@@ -49,7 +49,7 @@ export default function Router () {
       path: '/tasklist',
       children: [
         { path: '', element: <PrivateRoute element={TaskListIndex} /> },
-        { path: 'tasks',
+        { path: ':taskListId/tasks',
           children: [
             { path: '', element: <PrivateRoute element={TasksIndex} /> },
             { path: 'add-task', element: <PrivateRoute element={TaskOpsIndex} /> },

@@ -3,8 +3,8 @@ import { catchError, successFunc } from "../../helper/helper";
 import { ADD_TASK, CLEAR_RES_MESSAGE, DELETE_TASK, GET_TASKS, GET_TASK_DETAILS, UPDATE_TASK } from "../constants";
 
 export const getTasks = () => async (dispatch) => {
+  dispatch({ type: CLEAR_RES_MESSAGE })
   await instanceAxios.get('/task').then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: GET_TASKS,
       payload: {
@@ -13,14 +13,13 @@ export const getTasks = () => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(GET_TASKS, error))
   })
 }
 
 export const getTaskDetails = (taskId) => async (dispatch) => {
+  dispatch({ type: CLEAR_RES_MESSAGE })
   await instanceAxios.get(`/task/${taskId}`).then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: GET_TASK_DETAILS,
       payload: {
@@ -29,14 +28,13 @@ export const getTaskDetails = (taskId) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(GET_TASK_DETAILS, error))
   })
 }
 
 export const addTask = (data) => async (dispatch) => {
+  dispatch({ type: CLEAR_RES_MESSAGE })
   await instanceAxios.post('/task', data).then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: ADD_TASK,
       payload: {
@@ -44,14 +42,13 @@ export const addTask = (data) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(ADD_TASK, error))
   })
 }
 
 export const updateTask = (data, taskId) => async (dispatch) => {
+  dispatch({ type: CLEAR_RES_MESSAGE })
   await instanceAxios.put(`/task/${taskId}`, data).then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: UPDATE_TASK,
       payload: {
@@ -59,7 +56,6 @@ export const updateTask = (data, taskId) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(UPDATE_TASK, error))
   })
 }

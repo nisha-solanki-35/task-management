@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useFormik } from 'formik';
-import { Button, ErrorText, Form, FormContainer, Input } from '../../../components/FormComponent';
-import { useDispatch, useSelector } from 'react-redux';
-import { addCategory, getCategoryDetails, updateCategory } from '../../../redux/actions/category';
+import React, { useEffect, useState } from 'react'
+import { useFormik } from 'formik'
+import { Button, ErrorText, Form, FormContainer, Input } from '../../../components/FormComponent'
+import { useDispatch, useSelector } from 'react-redux'
+import { addCategory, getCategoryDetails, updateCategory } from '../../../redux/actions/category'
 import { useNavigate } from 'react-router-dom'
-import AlertComponent from '../../../components/Alert';
+import AlertComponent from '../../../components/Alert'
 import PropTypes from 'prop-types'
 
 const validate = values => {
-  const requiredFields = ['name'];
-  const errors = {};
+  const requiredFields = ['name']
+  const errors = {}
   requiredFields.forEach(field => {
     if (!values[field]) {
-      errors[field] = 'Required field';
+      errors[field] = 'Required field'
     }
-  });
-  return errors;
-};
+  })
+  return errors
+}
 
 function CategoryOperation (props) {
   const { categoryId } = props
@@ -35,7 +35,6 @@ function CategoryOperation (props) {
       dispatch(getCategoryDetails(categoryId))
     }
   }, [])
-  console.log('categoryDetails :>> ', categoryDetails);
 
   useEffect(() => {
     if (successMessage) {
@@ -68,22 +67,26 @@ function CategoryOperation (props) {
   }, [alert])
 
   const formik = useFormik({
-    initialValues: categoryId ? {
-      name: categoryDetails?.name
-    } 
-    : {
+    initialValues: {
       name: '',
     },
     validate,
     onSubmit: values => {
-      console.log('Form values:', values);
       if (categoryId) {
-        dispatch(updateCategory(values))
+        dispatch(updateCategory(values, categoryId))
       } else {
         dispatch(addCategory(values))
       }
     }
-  });
+  })
+
+  useEffect(() => {
+    if (categoryDetails) {
+      formik.setValues({
+        name: categoryDetails?.name || '',
+      })
+    }
+  }, [categoryDetails])
 
   return (
     <FormContainer>

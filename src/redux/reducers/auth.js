@@ -1,12 +1,18 @@
-import { LOGIN } from '../constants'
+import { LOGIN, REGISTER } from '../constants'
 
 export default (state = {}, action) => {
   switch (action.type) {
     case LOGIN:
       return {
         ...state,
-        userData: action.payload.data,
-        successMessage: action.payload.successMessage
+        successMessage: action.payload.successMessage,
+        errorMessage: action.payload.errorMessage
+      }
+    case REGISTER:
+      return {
+        ...state,
+        successMessage: action.payload.successMessage,
+        errorMessage: action.payload.errorMessage
       }
     default:
       return state

@@ -5,16 +5,18 @@ import HeaderComponent from '../../../components/Header'
 import { useParams } from 'react-router-dom'
 
 function TaskOpsIndex() {
-  const { taskId } = useParams()
+  const { taskListId, taskId } = useParams()
 
   return (
     <div>
       <Navbar />
       <HeaderComponent
-        blogId={taskId}
         heading={taskId ? 'Edit Task' : 'Add Task'}
       />
-      <TaskOperation />
+      <TaskOperation
+        taskId={taskId}
+        taskListId={taskListId}
+      />
     </div>
   )
 }

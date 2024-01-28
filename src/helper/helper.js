@@ -11,7 +11,7 @@ export function catchError (type, error) {
   return {
     type,
     payload: {
-      errorMessage: error?.response ? error.response.data.message : 'Server unavailable'
+      errorMessage: error?.response?.data?.data || error?.response?.data?.message || 'Server unavailable'
     }
   }
 }

@@ -12,9 +12,10 @@ function TaskListOpsIndex() {
       <Navbar />
       <HeaderComponent
         heading={taskListId ? 'Edit TaskList' : 'Add TaskList'}
+      />
+      <TaskListOperation
         taskListId={taskListId}
       />
-      <TaskListOperation />
     </div>
   )
 }

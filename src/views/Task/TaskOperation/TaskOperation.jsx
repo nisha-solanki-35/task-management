@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import { Button, ErrorText, Form, FormContainer, Input } from '../../../components/FormComponent'
+import { Button, ErrorText, Form, FormContainer, Input, StyledSelect } from '../../../components/FormComponent'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import AlertComponent from '../../../components/Alert'
 import PropTypes from 'prop-types'
 import { addTask, getTaskDetails, updateTask } from '../../../redux/actions/task'
+import moment from 'moment'
 
 const validate = values => {
-  const requiredFields = ['task_name', 'task_completed', 'task_date', 'task_list_id']
+  const requiredFields = ['task_name', 'task_completed', 'task_date']
   const errors = {}
   requiredFields.forEach(field => {
     if (!values[field]) {
@@ -19,7 +20,7 @@ const validate = values => {
 }
 
 function TaskOperation (props) {
-  const { taskId } = props
+  const { taskListId, taskId } = props
   const navigate= useNavigate()
   const dispatch = useDispatch()
   const taskDetails = useSelector(state => state.task.taskDetails)
@@ -44,7 +45,7 @@ function TaskOperation (props) {
         setAlert(true)
         setSuccess(true)
       } else {
-        navigate('/tasks', {
+        navigate(`/taskList/${taskListId}/tasks`, {
           state: { message: successMessage }
         })
       }
@@ -52,10 +53,12 @@ function TaskOperation (props) {
   }, [successMessage])
 
   useEffect(() => {
-    if (errorMessage) {
+    if (typeof errorMessage === 'string') {
       setMessage(errorMessage)
       setAlert(true)
       setSuccess(false)
+    } else {
+      formik.setErrors(errorMessage)
     }
   }, [errorMessage])
 
@@ -68,28 +71,32 @@ function TaskOperation (props) {
   }, [alert])
 
   const formik = useFormik({
-    initialValues: taskId ? {
-      task_name: taskDetails?.task_name,
-      task_completed: taskDetails?.task_completed,
-      task_date: taskDetails?.task_date,
-      task_list_id: taskDetails?.task_list_id
-    } 
-    : {
+    initialValues: {
       task_name: '',
       task_completed: '',
-      task_date: '',
-      task_list_id: ''
+      task_date: moment(Date.now()).format('YYYY-MM-DD'),
+      task_list_id: taskListId || ''
     },
     validate,
     onSubmit: values => {
-      console.log('Form values:', values)
       if (taskId) {
-        dispatch(updateTask(values))
+        dispatch(updateTask(values, taskId))
       } else {
         dispatch(addTask(values))
       }
     }
   })
+
+  useEffect(() => {
+    if (taskDetails) {
+      formik.setValues({
+        task_name: taskDetails?. task_name|| '',
+        task_completed: taskDetails?. task_completed|| '',
+        task_date: taskDetails?.task_date|| '',
+        task_list_id: taskListId || ''
+      })
+    }
+  }, [taskDetails])
 
   return (
     <FormContainer>
@@ -100,57 +107,48 @@ function TaskOperation (props) {
           id="task_name"
           name="task_name"
           onChange={formik.handleChange}
-          placeholder="Title"
+          placeholder="Task Name"
           type="text"
           value={formik.values.task_name}
         />
         {formik.touched.task_name && formik.errors.task_name ? (
           <ErrorText>{formik.errors.task_name}</ErrorText>
         ) : null}
-        <Input
+        <StyledSelect
           error={formik.touched.task_completed && formik.errors.task_completed}
           id="task_completed"
           name="task_completed"
           onChange={formik.handleChange}
-          placeholder="Category"
-          type="task_completed"
           value={formik.values.task_completed}
-        />
+        >
+          <option value="">Status</option>
+          <option value="0">Pending</option>
+          <option value="1">Completed</option>
+        </StyledSelect>
         {formik.touched.task_completed && formik.errors.task_completed ? (
           <ErrorText>{formik.errors.task_completed}</ErrorText>
-        ) : null}
+          ) : null}
         <Input
           error={formik.touched.task_date && formik.errors.task_date}
           id="task_date"
           name="task_date"
           onChange={formik.handleChange}
-          placeholder="Description"
-          type="textarea"
+          placeholder="Date"
+          type="date"
           value={formik.values.task_date}
         />
         {formik.touched.task_date && formik.errors.task_date ? (
           <ErrorText>{formik.errors.task_date}</ErrorText>
         ) : null}
-        <Input
-          error={formik.touched.task_list_id && formik.errors.task_list_id}
-          id="task_list_id"
-          name="task_list_id"
-          onChange={formik.handleChange}
-          placeholder="Attachment"
-          type="file"
-          value={formik.values.task_list_id}
-        />
-        {formik.touched.task_list_id && formik.errors.task_list_id ? (
-          <ErrorText>{formik.errors.task_list_id}</ErrorText>
-        ) : null}
-        <Button type="submit">{taskId ? 'Save changes' : 'Add Blog'}</Button>
+        <Button type="submit">{taskId ? 'Save changes' : 'Add Task'}</Button>
       </Form>
     </FormContainer>
   )
 }
 
 TaskOperation.propTypes = {
-  taskId: PropTypes.string
+  taskId: PropTypes.string,
+  taskListId: PropTypes.string
 }
 
 export default TaskOperation

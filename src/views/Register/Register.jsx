@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import { Button, ErrorText, Form, FormContainer, Input } from '../../components/FormComponent'
 import { register } from '../../redux/actions/auth'
 import { useNavigate } from 'react-router-dom'
-import AlertComponent from '../../components/Alert'
 
 const validate = values => {
-  const requiredFields = ['first_name', 'last_name', 'city', 'phone', 'email', 'password']
+  const requiredFields = ['first_name', 'last_name', 'city', 'phone', 'email', 'password', 'profile_image']
   const errors = {}
   requiredFields.forEach(field => {
     if (!values[field]) {
@@ -21,12 +20,9 @@ function Register () {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const [alert, setAlert] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [message, setMessage] = useState('')
-
   const successMessage = useSelector(state => state.auth.successMessage)
   const errorMessage = useSelector(state => state.auth.errorMessage)
+  console.log('errorMessage :>> ', errorMessage);
 
   useEffect(() => {
     if (successMessage) {
@@ -38,9 +34,7 @@ function Register () {
 
   useEffect(() => {
     if (errorMessage) {
-      setMessage(errorMessage)
-      setAlert(true)
-      setSuccess(false)
+      formik.setErrors(errorMessage)
     }
   }, [errorMessage])
 
@@ -51,20 +45,19 @@ function Register () {
       city: '',
       phone: '',
       email: '',
-      // profile_image: '',
+      profile_image: '',
       password: ''
     },
     validate,
     onSubmit: (values) => {
-      console.log("vlues", values)
       dispatch(register(values))
     }
   })
 
+  console.log('formik :>> ', formik);
 
   return (
     <FormContainer>
-      {alert && <AlertComponent message={message} setAlert={setAlert} success={success} />}
       <Form onSubmit={formik.handleSubmit}>
         <Input
           error={formik.touched.first_name && formik.errors.first_name}
@@ -137,6 +130,20 @@ function Register () {
         />
         {formik.touched.password && formik.errors.password ? (
           <ErrorText>{formik.errors.password}</ErrorText>
+        ) : null}
+        <Input
+          accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml"
+          error={formik.touched.profile_image && formik.errors.profile_image}
+          id="profile_image"
+          name="profile_image"
+          // onChange={formik.handleChange}
+          onChange={(event) => formik.setFieldValue('profile_image', event.currentTarget.files[0])}
+          type="file"
+          value={formik.values.profile_image?.name}
+        />
+        {/* <ErrorMessage component="div" name="profile_image" /> */}
+        {formik.touched.profile_image && formik.errors.profile_image ? (
+          <ErrorText>{formik.errors.profile_image}</ErrorText>
         ) : null}
         <Button type="submit">Register</Button>
       </Form>
