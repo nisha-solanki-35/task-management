@@ -11,6 +11,7 @@ export default (state = {}, action) => {
     case REGISTER:
       return {
         ...state,
+        userData: action.payload.userData,
         successMessage: action.payload.successMessage,
         errorMessage: action.payload.errorMessage
       }

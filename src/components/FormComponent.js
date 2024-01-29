@@ -36,3 +36,13 @@ export const StyledSelect = styled.select`
   margin-bottom: 16px;
   border: ${(props) => (props.error && '1px solid red')};
 `;
+
+export const Container = styled.div`
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+`;
+
+export const SelectContainer = styled.div`
+  margin-bottom: 16px;
+`;

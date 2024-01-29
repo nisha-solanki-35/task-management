@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import { Button, ErrorText, Form, FormContainer, Input } from '../../../components/FormComponent'
+import { Button, Container, ErrorText, Form, FormContainer, Input, SelectContainer } from '../../../components/FormComponent'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import AlertComponent from '../../../components/Alert'
 import { addBlog, getBlogDetails, updateBlog } from '../../../redux/actions/blog'
 import PropTypes from 'prop-types'
 import moment from 'moment'
+import { getCategories } from '../../../redux/actions/category'
+import makeAnimated from 'react-select/animated'
+import Select from 'react-select'
+const animatedComponents = makeAnimated()
 
 const validate = values => {
   const requiredFields = ['user_id', 'blog_date', 'title', 'category_id', 'description', 'attachment']
@@ -23,6 +27,7 @@ function BlogOperation (props) {
   const { blogId } = props
   const navigate= useNavigate()
   const dispatch = useDispatch()
+  const categories = useSelector(state => state.category.categoryList)
   const blogDetails = useSelector(state => state.blog.blogDetails)
   const successMessage = useSelector(state => state.blog.successMessage)
   const errorMessage = useSelector(state => state.blog.errorMessage)
@@ -30,13 +35,31 @@ function BlogOperation (props) {
   const [alert, setAlert] = useState(false)
   const [success, setSuccess] = useState(false)
   const [message, setMessage] = useState('')
+  const [options, setOptions] = useState([])
 
   useEffect(() => {
+    dispatch(getCategories())
     if (blogId) {
       dispatch(getBlogDetails(blogId))
     }
   }, [])
-  console.log('blogDetails :>> ', blogDetails)
+
+  useEffect(() => {
+    if (categories) {
+      const arr = []
+      if (categories?.data?.length > 0) {
+        categories?.data?.map((data) => {
+          const obj = {
+            value: data?.id,
+            label: data?.name
+          }
+          arr?.push(obj)
+          return arr
+        })
+        setOptions(arr)
+      }
+    }
+  }, [categories])
 
   useEffect(() => {
     if (successMessage) {
@@ -72,29 +95,57 @@ function BlogOperation (props) {
 
   const formik = useFormik({
     initialValues: {
+      user_id: JSON.parse(localStorage.getItem('UserData'))?.id || '',
+      blog_date: moment(Date.now()).format('DD-MM-YYYY') || '',
       title: '',
-      category_id: '',
+      category_id: [],
       description: '',
       attachment: ''
     },
     validate,
     onSubmit: values => {
-      console.log('Form values:', values)
       if (blogId) {
-        dispatch(updateBlog(values))
+        const selected = []
+        values?.category_id.map((data) => {
+          selected.push(data.value)
+          return selected
+        })
+        const data = {
+          ...values,
+          category_id: [...selected]
+        }
+        dispatch(updateBlog(data, blogId))
       } else {
-        dispatch(addBlog(values))
+        const selected = []
+        values?.category_id.map((data) => {
+          selected.push(data.value)
+          return selected
+        })
+        const data = {
+          ...values,
+          category_id: [...selected]
+        }
+        dispatch(addBlog(data))
       }
     }
   })
 
   useEffect(() => {
     if (blogDetails) {
+      const arr = []
+      blogDetails?.category?.map((data) => {
+        const obj = {
+          value: data?.id,
+          label: data?.name
+        }
+        arr?.push(obj)
+        return arr
+      })
       formik.setValues({
-        user_id: '',
+        user_id: JSON.parse(localStorage.getItem('UserData'))?.id || '',
         blog_date: moment(Date.now()).format('DD-MM-YYYY') || '',
         title: blogDetails?. title|| '',
-        category_id: blogDetails?.category_id || '',
+        category_id: arr || '',
         description: blogDetails?.description|| '',
         attachment: blogDetails?.attachment || ''
       })
@@ -106,6 +157,7 @@ function BlogOperation (props) {
       {alert && <AlertComponent message={message} setAlert={setAlert} success={success} />}
       <Form onSubmit={formik.handleSubmit}>
         <Input
+          disabled
           error={formik.touched.user_id && formik.errors.user_id}
           id="user_id"
           name="user_id"
@@ -118,6 +170,7 @@ function BlogOperation (props) {
           <ErrorText>{formik.errors.user_id}</ErrorText>
         ) : null}
         <Input
+          disabled
           error={formik.touched.blog_date && formik.errors.blog_date}
           id="blog_date"
           name="blog_date"
@@ -141,18 +194,25 @@ function BlogOperation (props) {
         {formik.touched.title && formik.errors.title ? (
           <ErrorText>{formik.errors.title}</ErrorText>
         ) : null}
-        <Input
-          error={formik.touched.category_id && formik.errors.category_id}
-          id="category_id"
-          name="category_id"
-          onChange={formik.handleChange}
-          placeholder="Category"
-          type="category_id"
-          value={formik.values.category_id}
-        />
-        {formik.touched.category_id && formik.errors.category_id ? (
-          <ErrorText>{formik.errors.category_id}</ErrorText>
-        ) : null}
+        <SelectContainer>
+          <Select
+            captureMenuScroll={true}
+            closeMenuOnSelect={false}
+            components={animatedComponents}
+            id="category_id"
+            isMulti={true}
+            menuPlacement="auto"
+            menuPosition="fixed"
+            name="category_id"
+            onChange={(category_id) => formik.setFieldValue('category_id', category_id)}
+            options={options}
+            placeholder="Select Categories"
+            value={formik.values.category_id}
+          />
+          {formik.touched.category_id && formik.errors.category_id ? (
+            <ErrorText>{formik.errors.category_id}</ErrorText>
+          ) : null}
+        </SelectContainer>
         <Input
           error={formik.touched.description && formik.errors.description}
           id="description"
@@ -165,14 +225,26 @@ function BlogOperation (props) {
         {formik.touched.description && formik.errors.description ? (
           <ErrorText>{formik.errors.description}</ErrorText>
         ) : null}
+        <Container>
+          {(formik.values.attachment?.imageURL || formik.values.attachment) && (
+          <img 
+            alt='Add Image'
+            src={formik.values.attachment?.imageURL || formik.values.attachment}
+            style={{
+              height: "200px",
+              width: "300px"
+            }}
+          />
+          )}
+        </Container>
         <Input
+          accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml"
           error={formik.touched.attachment && formik.errors.attachment}
           id="attachment"
           name="attachment"
-          onChange={formik.handleChange}
+          onChange={(event) => formik.setFieldValue('attachment', { imageURL: URL?.createObjectURL(event?.target?.files[0]), file: event?.target?.files[0] })}
           placeholder="Attachment"
-          type="text"
-          value={formik.values.attachment}
+          type="file"
         />
         {formik.touched.attachment && formik.errors.attachment ? (
           <ErrorText>{formik.errors.attachment}</ErrorText>

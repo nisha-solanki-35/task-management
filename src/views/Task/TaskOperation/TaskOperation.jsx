@@ -36,7 +36,6 @@ function TaskOperation (props) {
       dispatch(getTaskDetails(taskId))
     }
   }, [])
-  console.log('taskDetails :>> ', taskDetails)
 
   useEffect(() => {
     if (successMessage) {
@@ -44,6 +43,7 @@ function TaskOperation (props) {
         setMessage(successMessage)
         setAlert(true)
         setSuccess(true)
+        dispatch(getTaskDetails(taskId))
       } else {
         navigate(`/taskList/${taskListId}/tasks`, {
           state: { message: successMessage }
@@ -53,12 +53,14 @@ function TaskOperation (props) {
   }, [successMessage])
 
   useEffect(() => {
-    if (typeof errorMessage === 'string') {
-      setMessage(errorMessage)
-      setAlert(true)
-      setSuccess(false)
-    } else {
-      formik.setErrors(errorMessage)
+    if (errorMessage) {
+      if (typeof errorMessage === 'string') {
+        setMessage(errorMessage)
+        setAlert(true)
+        setSuccess(false)
+      } else {
+        formik.setErrors(errorMessage)
+      }
     }
   }, [errorMessage])
 
@@ -90,8 +92,8 @@ function TaskOperation (props) {
   useEffect(() => {
     if (taskDetails) {
       formik.setValues({
-        task_name: taskDetails?. task_name|| '',
-        task_completed: taskDetails?. task_completed|| '',
+        task_name: taskDetails?.task_name|| '',
+        task_completed: taskDetails?.task_completed|| '',
         task_date: taskDetails?.task_date|| '',
         task_list_id: taskListId || ''
       })

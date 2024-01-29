@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
-import { Button, ErrorText, Form, FormContainer, Input } from '../../components/FormComponent'
+import { Button, Container, ErrorText, Form, FormContainer, Input } from '../../components/FormComponent'
 import AlertComponent from '../../components/Alert'
 import { getUserDetails, updateUserProfile } from '../../redux/actions/user'
 import styled from 'styled-components'
@@ -12,7 +12,7 @@ const UserHeading = styled.h3`
 `
 
 const validate = values => {
-  const requiredFields = ['first_name', 'last_name', 'city', 'phone', 'email', 'password']
+  const requiredFields = ['first_name', 'last_name', 'city', 'phone', 'email', 'password', 'profile_image']
   const errors = {}
   requiredFields.forEach(field => {
     if (!values[field]) {
@@ -46,11 +46,9 @@ function Profile () {
     if (alert) {
       setTimeout(() => {
         setAlert(false)
-      }, 3000)
+      }, 10000)
     }
   }, [alert])
-
-  console.log('userDetails', userDetails)
 
   useEffect(() => {
     if (successMessage) {
@@ -78,15 +76,13 @@ function Profile () {
       phone: '',
       email: '',
       profile_image: '',
-      password: ''
+      password: '',
     },
     validate,
     onSubmit: (values) => {
-      console.log("values", values)
       dispatch(updateUserProfile(values))
     }
   })
-  console.log('formik', formik)
   
   useEffect(() => {
     if (userDetails) {
@@ -97,7 +93,7 @@ function Profile () {
         phone: userDetails?.phone || '',
         email: userDetails?.email || '',
         profile_image: userDetails?.profile_image || '',
-        // password: userDetails?.password
+        password: userDetails?.password || ''
       })
     }
   }, [userDetails])
@@ -183,6 +179,26 @@ function Profile () {
         />
         {formik.touched.password && formik.errors.password ? (
           <ErrorText>{formik.errors.password}</ErrorText>
+        ) : null}
+        <Container>
+          <img 
+            src={formik.values.profile_image?.imageURL || formik.values.profile_image}
+            style={{
+              height: "200px",
+              width: "300px"
+            }}
+          />
+        </Container>
+        <Input
+          accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml"
+          error={formik.touched.profile_image && formik.errors.profile_image}
+          id="profile_image"
+          name="profile_image"
+          onChange={(event) => formik.setFieldValue('profile_image', { imageURL: URL?.createObjectURL(event?.target?.files[0]), file: event?.target?.files[0] })}
+          type="file"
+        />
+        {formik.touched.profile_image && formik.errors.profile_image ? (
+          <ErrorText>{formik.errors.profile_image}</ErrorText>
         ) : null}
         <Button type="submit">Update Profile</Button>
       </Form>

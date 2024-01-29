@@ -1,27 +1,70 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { DeleteButton, EditButton, Table, Td, Th, Button, ButtonContainer, DataNotFound } from '../../components/Table'
-import { useNavigate } from 'react-router-dom'
-import { getBlogs } from '../../redux/actions/blog'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { deleteBlog, getBlogs } from '../../redux/actions/blog'
 import moment from 'moment'
+import AlertComponent from '../../components/Alert'
 // import PropTypes from 'prop-types'
 
 function Blogs() {
+  const { state } = useLocation()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blog.blogList)
+  const successMessage = useSelector(state => state.blog.successMessage)
+  const errorMessage = useSelector(state => state.blog.errorMessage)
 
+  const [alert, setAlert] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    dispatch(getBlogs())
+    if (state?.message) {
+      setMessage(state?.message)
+      setAlert(true)
+      setSuccess(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (alert) {
+      setTimeout(() => {
+        setAlert(false)
+      }, 3000)
+    }
+  }, [alert])
+
+  useEffect(() => {
+    if (successMessage) {
+      setMessage(successMessage)
+      setAlert(true)
+      setSuccess(true)
+      dispatch(getBlogs())
+    }
+  }, [successMessage])
+
+  useEffect(() => {
+    if (errorMessage) {
+      setMessage(errorMessage)
+      setAlert(true)
+      setSuccess(false)
+      dispatch(getBlogs())
+    }
+  }, [errorMessage])
 
   useEffect(() => {
     dispatch(getBlogs())
   }, [])
 
   const onDelete = (id) => {
-    console.log('id :>> ', id);
+    dispatch(deleteBlog(id))
   }
 
   return (
     <>
+      {alert && <AlertComponent message={message} setAlert={setAlert} success={success} />}
       <ButtonContainer moreButton={true} >
         <Button onClick={() => navigate('/categories')}>Categories</Button>
         <Button onClick={() => navigate('/blogs/add-blog')}>Add Blog</Button>
@@ -44,7 +87,7 @@ function Blogs() {
               <Td>{blog?.id || '--'}</Td>
               <Td>{blog?.user_detail?.first_name + blog?.user_detail?.last_name|| '--'}</Td>
               <Td>{blog?.title || '--'}</Td>
-              <Td>{blog?.category?.length > 0 ? blog?.category?.toString() : '--'}</Td>
+              <Td>{blog?.category?.length > 0 ? blog?.category?.map(data => data.name).toString() : '--'}</Td>
               <Td>{moment(blog?.created_at).format('LLL')}</Td>
               <Td>
                 <img 

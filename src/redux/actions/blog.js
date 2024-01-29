@@ -4,7 +4,6 @@ import { ADD_BLOG, CLEAR_RES_MESSAGE, DELETE_BLOG, GET_BLOGS, GET_BLOG_DETAILS, 
 
 export const getBlogs = () => async (dispatch) => {
   await instanceAxios.get('/blog').then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: GET_BLOGS,
       payload: {
@@ -13,14 +12,12 @@ export const getBlogs = () => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(GET_BLOGS, error))
   })
 }
 
 export const getBlogDetails = (blogId) => async (dispatch) => {
   await instanceAxios.get(`/blog/${blogId}`).then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: GET_BLOG_DETAILS,
       payload: {
@@ -29,14 +26,24 @@ export const getBlogDetails = (blogId) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(GET_BLOG_DETAILS, error))
   })
 }
 
 export const addBlog = (data) => async (dispatch) => {
-  await instanceAxios.post('/blog', data).then((response) => {
-    console.log('response :>> ', response);
+  const { user_id, blog_date, title, category_id, description, attachment } = data
+  const bodyFormData = new FormData()
+  bodyFormData.append('user_id', user_id)
+  bodyFormData.append('blog_date', blog_date)
+  bodyFormData.append('title', title)
+  if (Array.isArray(category_id)) {
+    category_id.forEach((item, index) => {
+      bodyFormData.append(`category_id[${index}]`, item);
+    })
+  }
+  bodyFormData.append('description', description)
+  bodyFormData.append('attachment', attachment?.file)
+  await instanceAxios.post('/blog', bodyFormData, { headers: { 'content-type': 'multipart/form-data' } }).then((response) => {
     dispatch({
       type: ADD_BLOG,
       payload: {
@@ -44,14 +51,28 @@ export const addBlog = (data) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(ADD_BLOG, error))
   })
 }
 
 export const updateBlog = (data, blogId) => async (dispatch) => {
+  const { user_id, blog_date, title, category_id, description, attachment } = data
+  const bodyFormData = new FormData()
+  if (attachment?.file) {
+    bodyFormData.append('attachment', attachment?.file)
+  } else {
+    const blobData = new Blob([attachment], { type: 'text/plain' })
+    bodyFormData.append('attachment', blobData)
+  }
+  bodyFormData.append('user_id', user_id)
+  bodyFormData.append('blog_date', blog_date)
+  bodyFormData.append('title', title)
+  if (Array.isArray(category_id)) {
+    category_id.forEach((item, index) => {
+      bodyFormData.append(`category_id[${index}]`, item);
+    })
+  }  bodyFormData.append('description', description)
   await instanceAxios.put(`/blog/${blogId}`, data).then((response) => {
-    console.log('response :>> ', response);
     dispatch({
       type: UPDATE_BLOG,
       payload: {
@@ -59,7 +80,6 @@ export const updateBlog = (data, blogId) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error?.response :>> ', error?.response);
     dispatch(catchError(UPDATE_BLOG, error))
   })
 }

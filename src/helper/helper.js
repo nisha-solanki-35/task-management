@@ -8,10 +8,20 @@ export function successFunc (type, response) {
 }
 
 export function catchError (type, error) {
+  let err
+  if (error?.response?.data?.data?.error) {
+    err = error?.response?.data?.data?.error
+  } else if (error?.response?.data?.data) {
+    err = error?.response?.data?.data
+  } else if (error?.response?.data?.message) {
+    err = error?.response?.data?.message
+  } else {
+    err = 'Server unavailable'
+  }
   return {
     type,
     payload: {
-      errorMessage: error?.response?.data?.data || error?.response?.data?.message || 'Server unavailable'
+      errorMessage: err
     }
   }
 }

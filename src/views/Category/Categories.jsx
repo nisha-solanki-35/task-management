@@ -57,7 +57,6 @@ function Categories() {
   const onDelete = (id) => {
     dispatch(deleteCategory(id))
   }
-  console.log('categories :>> ', categories);
 
   return (
     <>

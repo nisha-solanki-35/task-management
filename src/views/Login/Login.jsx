@@ -37,12 +37,22 @@ const Login = () => {
   }, [successMessage])
 
   useEffect(() => {
-    if (errorMessage) {
+    if (typeof errorMessage === 'string') {
       setMessage(errorMessage)
       setAlert(true)
       setSuccess(false)
+    } else {
+      formik.setErrors(errorMessage)
     }
   }, [errorMessage])
+
+  useEffect(() => {
+    if (alert) {
+      setTimeout(() => {
+        setAlert(false)
+      }, 3000)
+    }
+  }, [alert])
 
   const formik = useFormik({
     initialValues: {
@@ -51,7 +61,6 @@ const Login = () => {
     },
     validate,
     onSubmit: values => {
-      console.log('Form values:', values)
       dispatch(login(values))
     },
   })

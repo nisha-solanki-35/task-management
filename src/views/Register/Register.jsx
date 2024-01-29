@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
-import { Button, ErrorText, Form, FormContainer, Input } from '../../components/FormComponent'
+import { Button, Container, ErrorText, Form, FormContainer, Input } from '../../components/FormComponent'
 import { register } from '../../redux/actions/auth'
 import { useNavigate } from 'react-router-dom'
 
 const validate = values => {
-  const requiredFields = ['first_name', 'last_name', 'city', 'phone', 'email', 'password', 'profile_image']
+  const requiredFields = ['first_name', 'last_name', 'city', 'phone', 'email', 'profile_image']
   const errors = {}
   requiredFields.forEach(field => {
     if (!values[field]) {
@@ -20,14 +20,14 @@ function Register () {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
+  const userData = useSelector(state => state.auth.userData)
   const successMessage = useSelector(state => state.auth.successMessage)
   const errorMessage = useSelector(state => state.auth.errorMessage)
-  console.log('errorMessage :>> ', errorMessage);
 
   useEffect(() => {
     if (successMessage) {
       navigate('/dashboard/profile', {
-        state: { message: successMessage }
+        state: { message: successMessage + ' Your temporary Password is ' + userData?.your_password }
       })
     }
   }, [successMessage])
@@ -46,7 +46,6 @@ function Register () {
       phone: '',
       email: '',
       profile_image: '',
-      password: ''
     },
     validate,
     onSubmit: (values) => {
@@ -119,29 +118,23 @@ function Register () {
         {formik.touched.email && formik.errors.email ? (
           <ErrorText>{formik.errors.email}</ErrorText>
         ) : null}
-        <Input
-          error={formik.touched.password && formik.errors.password}
-          id="password"
-          name="password"
-          onChange={formik.handleChange}
-          placeholder="Password"
-          type="password"
-          value={formik.values.password}
-        />
-        {formik.touched.password && formik.errors.password ? (
-          <ErrorText>{formik.errors.password}</ErrorText>
-        ) : null}
+        <Container>
+          <img 
+            src={formik.values.profile_image?.imageURL || formik.values.profile_image}
+            style={{
+              height: "200px",
+              width: "300px"
+            }}
+          />
+        </Container>
         <Input
           accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml"
           error={formik.touched.profile_image && formik.errors.profile_image}
           id="profile_image"
           name="profile_image"
-          // onChange={formik.handleChange}
-          onChange={(event) => formik.setFieldValue('profile_image', event.currentTarget.files[0])}
+          onChange={(event) => formik.setFieldValue('profile_image', { imageURL: URL?.createObjectURL(event?.target?.files[0]), file: event?.target?.files[0] })}
           type="file"
-          value={formik.values.profile_image?.name}
         />
-        {/* <ErrorMessage component="div" name="profile_image" /> */}
         {formik.touched.profile_image && formik.errors.profile_image ? (
           <ErrorText>{formik.errors.profile_image}</ErrorText>
         ) : null}

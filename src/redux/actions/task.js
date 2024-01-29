@@ -23,8 +23,7 @@ export const getTaskDetails = (taskId) => async (dispatch) => {
     dispatch({
       type: GET_TASK_DETAILS,
       payload: {
-        data: response?.data?.data,
-        successMessage: response.data.message
+        data: response?.data?.data
       }
     })
   }).catch((error) => {
