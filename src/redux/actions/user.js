@@ -20,9 +20,6 @@ export const updateUserProfile = (data) => async (dispatch) => {
   const bodyFormData = new FormData()
   if (profile_image?.file) {
     bodyFormData.append('profile_image', profile_image?.file)
-  } else {
-    const blobData = new Blob([profile_image], { type: 'text/plain' })
-    bodyFormData.append('profile_image', blobData)
   }
   bodyFormData.append('first_name', first_name)
   bodyFormData.append('last_name', last_name)

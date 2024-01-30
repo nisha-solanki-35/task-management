@@ -13,7 +13,7 @@ import Select from 'react-select'
 const animatedComponents = makeAnimated()
 
 const validate = values => {
-  const requiredFields = ['user_id', 'blog_date', 'title', 'category_id', 'description', 'attachment']
+  const requiredFields = ['user_id', 'blog_date', 'category_id', 'description', 'attachment']
   const errors = {}
   requiredFields.forEach(field => {
     if (!values[field]) {
@@ -67,6 +67,7 @@ function BlogOperation (props) {
         setMessage(successMessage)
         setAlert(true)
         setSuccess(true)
+        dispatch(getBlogDetails(blogId))
       } else {
         navigate('/blogs', {
           state: { message: successMessage }
@@ -76,12 +77,14 @@ function BlogOperation (props) {
   }, [successMessage])
 
   useEffect(() => {
-    if (typeof errorMessage === 'string') {
-      setMessage(errorMessage)
-      setAlert(true)
-      setSuccess(false)
-    } else {
-      formik.setErrors(errorMessage)
+    if (errorMessage) {
+      if (typeof errorMessage === 'string') {
+        setMessage(errorMessage)
+        setAlert(true)
+        setSuccess(false)
+      } else {
+        formik.setErrors(errorMessage)
+      }
     }
   }, [errorMessage])
 
@@ -112,8 +115,10 @@ function BlogOperation (props) {
         })
         const data = {
           ...values,
-          category_id: [...selected]
+          category_id: [...selected],
+          attachment: values.attachment?.file ? values.attachment : undefined
         }
+        console.log('data', data)
         dispatch(updateBlog(data, blogId))
       } else {
         const selected = []
@@ -123,7 +128,8 @@ function BlogOperation (props) {
         })
         const data = {
           ...values,
-          category_id: [...selected]
+          category_id: [...selected],
+          attachment: values.attachment?.file ? values.attachment : undefined
         }
         dispatch(addBlog(data))
       }
@@ -144,7 +150,7 @@ function BlogOperation (props) {
       formik.setValues({
         user_id: JSON.parse(localStorage.getItem('UserData'))?.id || '',
         blog_date: moment(Date.now()).format('DD-MM-YYYY') || '',
-        title: blogDetails?. title|| '',
+        title: blogDetails?.title|| '',
         category_id: arr || '',
         description: blogDetails?.description|| '',
         attachment: blogDetails?.attachment || ''
@@ -152,26 +158,27 @@ function BlogOperation (props) {
     }
   }, [blogDetails])
 
+  console.log('formik', formik)
   return (
     <FormContainer>
       {alert && <AlertComponent message={message} setAlert={setAlert} success={success} />}
       <Form onSubmit={formik.handleSubmit}>
         <Input
           disabled
-          error={formik.touched.user_id && formik.errors.user_id}
+          error={formik?.touched?.user_id && formik?.errors?.user_id}
           id="user_id"
           name="user_id"
           onChange={formik.handleChange}
           placeholder="User Id"
           type="text"
-          value={formik.values.user_id}
+          value={formik?.values?.user_id}
         />
-        {formik.touched.user_id && formik.errors.user_id ? (
-          <ErrorText>{formik.errors.user_id}</ErrorText>
+        {formik?.touched?.user_id && formik?.errors?.user_id ? (
+          <ErrorText>{formik?.errors?.user_id}</ErrorText>
         ) : null}
         <Input
           disabled
-          error={formik.touched.blog_date && formik.errors.blog_date}
+          error={formik?.touched?.blog_date && formik?.errors?.blog_date}
           id="blog_date"
           name="blog_date"
           onChange={formik.handleChange}
@@ -183,7 +190,7 @@ function BlogOperation (props) {
           <ErrorText>{formik.errors.blog_date}</ErrorText>
         ) : null}
         <Input
-          error={formik.touched.title && formik.errors.title}
+          error={formik?.touched?.title && formik?.errors?.title}
           id="title"
           name="title"
           onChange={formik.handleChange}
@@ -191,7 +198,7 @@ function BlogOperation (props) {
           type="text"
           value={formik.values.title}
         />
-        {formik.touched.title && formik.errors.title ? (
+        {formik?.touched?.title && formik?.errors?.title ? (
           <ErrorText>{formik.errors.title}</ErrorText>
         ) : null}
         <SelectContainer>
@@ -214,7 +221,7 @@ function BlogOperation (props) {
           ) : null}
         </SelectContainer>
         <Input
-          error={formik.touched.description && formik.errors.description}
+          error={formik?.touched?.description && formik?.errors?.description}
           id="description"
           name="description"
           onChange={formik.handleChange}
@@ -226,7 +233,7 @@ function BlogOperation (props) {
           <ErrorText>{formik.errors.description}</ErrorText>
         ) : null}
         <Container>
-          {(formik.values.attachment?.imageURL || formik.values.attachment) && (
+          {(formik?.values?.attachment?.imageURL || formik?.values?.attachment) && (
           <img 
             alt='Add Image'
             src={formik.values.attachment?.imageURL || formik.values.attachment}
@@ -239,7 +246,7 @@ function BlogOperation (props) {
         </Container>
         <Input
           accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml"
-          error={formik.touched.attachment && formik.errors.attachment}
+          error={formik?.touched?.attachment && formik?.errors?.attachment}
           id="attachment"
           name="attachment"
           onChange={(event) => formik.setFieldValue('attachment', { imageURL: URL?.createObjectURL(event?.target?.files[0]), file: event?.target?.files[0] })}
