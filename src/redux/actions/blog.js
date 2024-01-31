@@ -61,12 +61,12 @@ export const updateBlog = (data, blogId) => async (dispatch) => {
   const bodyFormData = new FormData()
   if (attachment?.file) {
     bodyFormData.append('title', title)
-    // if (Array.isArray(category_id)) {
-    //   category_id.forEach((item, index) => {
-    //     bodyFormData.append(`category_id[${index}]`, item)
-    //   })
-    // }
-    bodyFormData.append('category_id', category_id)
+    if (Array.isArray(category_id)) {
+      category_id.forEach((item, index) => {
+        bodyFormData.append(`category_id[${index}]`, item)
+      })
+    }
+    // bodyFormData.append('category_id', category_id)
     bodyFormData.append('description', description)
     bodyFormData.append('attachment', attachment?.file)
     url = {
@@ -82,7 +82,6 @@ export const updateBlog = (data, blogId) => async (dispatch) => {
       data: data,
     }
   }
-  console.log('url', url)
   // bodyFormData.append('user_id', user_id)
   // bodyFormData.append('blog_date', blog_date)
   await instanceAxios(url).then((response) => {
@@ -93,7 +92,6 @@ export const updateBlog = (data, blogId) => async (dispatch) => {
       }
     })
   }).catch((error) => {
-    console.log('error', error)
     dispatch(catchError(UPDATE_BLOG, error))
   })
 }

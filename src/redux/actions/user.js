@@ -16,7 +16,7 @@ export const getUserDetails = () => async (dispatch) => {
 }
 
 export const updateUserProfile = (data) => async (dispatch) => {
-  const { first_name, last_name, city, phone, email, profile_image } = data
+  const { first_name, last_name, city, phone, email, password, profile_image } = data
   const bodyFormData = new FormData()
   if (profile_image?.file) {
     bodyFormData.append('profile_image', profile_image?.file)
@@ -26,6 +26,7 @@ export const updateUserProfile = (data) => async (dispatch) => {
   bodyFormData.append('city', city)
   bodyFormData.append('phone', phone)
   bodyFormData.append('email', email)
+  bodyFormData.append('password', password)
   await instanceAxios.post(`/user`, bodyFormData, { headers: { 'content-type': 'multipart/form-data' } }).then((response) => {
     dispatch({
       type: UPDATE_USER_PROFILE,

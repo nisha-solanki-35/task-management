@@ -29,6 +29,7 @@ function Tasks() {
       setAlert(true)
       setSuccess(true)
     }
+    window.history.replaceState({}, {})
   }, [])
 
   useEffect(() => {

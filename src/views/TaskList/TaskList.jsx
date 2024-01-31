@@ -25,6 +25,7 @@ function TaskList() {
       setAlert(true)
       setSuccess(true)
     }
+    window.history.replaceState({}, {})
   }, [])
   
   useEffect(() => {

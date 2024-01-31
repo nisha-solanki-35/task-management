@@ -26,7 +26,6 @@ function Blogs() {
   const [user, setUser] = useState('')
   const [userArr, setUserArr] = useState([])
   const previousProps = useRef({ category, user }).current
-  console.log('userArr', userArr)
 
   useEffect(() => {
     dispatch(getBlogs(category, user))
@@ -36,6 +35,7 @@ function Blogs() {
       setAlert(true)
       setSuccess(true)
     }
+    window.history.replaceState({}, {})
   }, [])
 
   useEffect(() => {
@@ -91,7 +91,6 @@ function Blogs() {
           name: data?.user_detail?.first_name + ' ' + data?.user_detail?.last_name
         }
         const userIds = userArr?.map(d => d?.id)
-        console.log('userIds', userIds)
         if (!userIds?.includes(userData?.id)) userArr.push(userData)
         return userArr
       })

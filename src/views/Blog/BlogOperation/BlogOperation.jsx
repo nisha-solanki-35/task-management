@@ -118,7 +118,6 @@ function BlogOperation (props) {
           category_id: [...selected],
           attachment: values.attachment?.file ? values.attachment : undefined
         }
-        console.log('data', data)
         dispatch(updateBlog(data, blogId))
       } else {
         const selected = []
@@ -158,7 +157,6 @@ function BlogOperation (props) {
     }
   }, [blogDetails])
 
-  console.log('formik', formik)
   return (
     <FormContainer>
       {alert && <AlertComponent message={message} setAlert={setAlert} success={success} />}

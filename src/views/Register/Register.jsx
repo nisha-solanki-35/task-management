@@ -53,7 +53,6 @@ function Register () {
     }
   })
 
-  console.log('formik :>> ', formik);
 
   return (
     <FormContainer>
@@ -118,6 +117,7 @@ function Register () {
         {formik.touched.email && formik.errors.email ? (
           <ErrorText>{formik.errors.email}</ErrorText>
         ) : null}
+        {(formik.values.profile_image?.imageURL || formik.values.profile_image) && (
         <Container>
           <img 
             src={formik.values.profile_image?.imageURL || formik.values.profile_image}
@@ -127,6 +127,7 @@ function Register () {
             }}
           />
         </Container>
+        )}
         <Input
           accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml"
           error={formik.touched.profile_image && formik.errors.profile_image}

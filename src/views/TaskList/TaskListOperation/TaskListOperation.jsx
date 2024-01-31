@@ -35,7 +35,6 @@ function TaskListOperation (props) {
       dispatch(getTaskListDetails(taskListId))
     }
   }, [])
-  console.log('taskListDetails :>> ', taskListDetails);
 
   useEffect(() => {
     if (successMessage) {
@@ -73,7 +72,6 @@ function TaskListOperation (props) {
     },
     validate,
     onSubmit: values => {
-      console.log('Form values:', values);
       if (taskListId) {
         dispatch(updateTaskList(values, taskListId))
       } else {

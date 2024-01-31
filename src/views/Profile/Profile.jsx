@@ -40,6 +40,7 @@ function Profile () {
       setAlert(true)
       setSuccess(true)
     }
+    window.history.replaceState({}, {})
   }, [])
 
   useEffect(() => {
@@ -59,12 +60,14 @@ function Profile () {
   }, [successMessage])
 
   useEffect(() => {
-    if (typeof errorMessage === 'string') {
-      setMessage(errorMessage)
-      setAlert(true)
-      setSuccess(false)
-    } else {
-      formik.setErrors(errorMessage)
+    if (errorMessage) {
+      if (typeof errorMessage === 'string') {
+        setMessage(errorMessage)
+        setAlert(true)
+        setSuccess(false)
+      } else {
+        formik.setErrors(errorMessage)
+      }
     }
   }, [errorMessage])
 
@@ -105,7 +108,7 @@ function Profile () {
       <UserHeading>
         Welcome 
         {' '}
-        {userDetails?.first_name}
+        {userDetails?.first_name + ' ' + userDetails?.last_name}
       </UserHeading>
       <Form onSubmit={formik.handleSubmit}>
         <Input

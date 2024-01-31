@@ -26,6 +26,7 @@ function Categories() {
       setAlert(true)
       setSuccess(true)
     }
+    window.history.replaceState({}, {})
   }, [])
 
   useEffect(() => {
